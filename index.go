@@ -8,6 +8,7 @@ import (
 
 const (
 	POST_INDEX = "post"
+	USER_INDEX="user" 
 	ES_URL= "http://35.232.174.70:9200"
 )
 
@@ -37,6 +38,28 @@ func main() {
 		_, err := client.CreateIndex(POST_INDEX).Body(mapping).Do(context.Background())
 		if err != nil {
 			panic(err)
+		}
+	}
+
+	exists, err = client.IndexExists(USER_INDEX).Do(context.Background()) 
+	if err != nil {
+		panic(err) 
+	}
+
+	if !exists {
+		mapping := `{
+			"mappings": {
+					"properties": {
+							"username": {"type": "keyword"},
+							"password": {"type": "keyword", "index": false},
+							"age":      {"type": "long", "index": false},
+							"gender":   {"type": "keyword", "index": false}
+					}
+			}
+		}`
+		_, err = client.CreateIndex(USER_INDEX).Body(mapping).Do(context.Background()) 
+		if err != nil {
+			panic(err) 
 		}
 	}
 
